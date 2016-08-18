@@ -7,4 +7,12 @@ package cycle;
 public interface MipCycle {
 
 	void setCycle(Cycle cycle);
+	
+	String prettyPrint();
+	
+	String whichCycle();
+	
+	boolean wasProcessed();
+
+	void setWasProcessed(boolean wasProcessed);
 }

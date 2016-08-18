@@ -1,5 +1,7 @@
 package com.comp.arch;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,8 +12,8 @@ public class RTypeFormatTranslator implements InstructionFormatTranslator {
 	private InstructionFormatRepository instructionFormatRepository; 
 	
 	@Override
-	public String translate(String instruction, String instructionKeyword) {
-		
+	public String translate(String instruction, String instructionKeyword, Map<String, String> offsetMap) {
+
 		InstFormat instFormat = instructionFormatRepository.findByInstruction(instructionKeyword);
 		
 		String actualOpCode = instruction.split(" ")[0]; // OP
@@ -35,6 +37,6 @@ public class RTypeFormatTranslator implements InstructionFormatTranslator {
 		sb.append(instFormat.getFunc());
 		
 		System.out.println(sb.toString());
-		return InstFormat.toHex(sb.toString());
+		return InstFormat.toHexByFour(sb.toString());
 	}
 }

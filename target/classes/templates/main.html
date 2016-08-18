@@ -1,29 +1,338 @@
-<!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-    <title>Getting Started: Handling Form Submission</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" integrity="sha384-MIwDKRSSImVFAZCVLtU0LMDdON6KVCrZHyVQQj6e8wIEJkW4tvwqXrbMIya1vriY" crossorigin="anonymous"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js" integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js" integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD" crossorigin="anonymous"></script>
+	
+    <title>MicroMips</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link href="/css/2-col-portfolio.css" rel="stylesheet" />
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<script>
+		function addOpcode() {
+			$.ajax({
+			    url: '/getOpcodesForSingleStep',
+			    type: 'GET',
+			    success: function(data) {
+			    	var split = data.split("-");
+			    	var row = "<tr><td>" + split[0]  + "</td><td>" + split[1] + "</td></tr>";
+			    	$('#opcodeSection').append(row);
+			    }
+			});
+		}
+		
+		function updateRegisters() {
+			$.ajax({
+			    url: '/getRegisterValues',
+			    type: 'GET',
+			    success: function(data) {
+			    	$('#memoryTable').html('');
+			    	
+				    var template = '<table class="table table-striped table-hover table-bordered">' + 
+			                '<tbody><thead><tr><th>Register</th><th>Value</th></tr></thead>';
+			        for (var register in data) {
+			        		template += '<tr><td>' + register + '</td><td>' + data[register] + '</td></tr>';
+			        }
+								
+					template += '</tbody></table>';
+					
+					$('#memoryTable').html(template);
+			    }
+			
+			});
+		}
+		
+		function updateData() {
+			$.ajax({
+			    url: '/getDataValues',
+			    type: 'GET',
+			    success: function(data) {
+			    	$('#dataTable').html('');
+			    	
+				    var template = '<table class="table table-striped table-hover table-bordered">' + 
+			                '<tbody><thead><tr><th>Data</th><th>Value</th></tr></thead>';
+			        for (var register in data) {
+			        		template += '<tr><td>' + register + '</td><td>' + data[register] + '</td></tr>';
+			        }
+								
+					template += '</tbody></table>';
+					
+					$('#dataTable').html(template);
+			    }
+			});
+		}
+			
+		function singleStep() {
+			var instructions = $('#instructions').val();
+			var nthCycle = parseInt($('#nthCycle').val(), 10);
+			var div = '<div class="card card-outline-primary text-xs-center">' + 
+			    		'<div class="card-block"> ' + 
+				    	'<blockquote class="card-blockquote">' + 
+					    	'<p>Cycle ' + (nthCycle + 1) + '</p>';
+			$.ajax({
+			    url: '/single-step',
+			    data: { 
+			    	instructions: instructions,
+			    	nthCycle: nthCycle,
+			    },
+			    type: 'POST',
+			    success: function(data) {
+			    	console.log(data);
+			    	if (data.ir) {
+				    	 div += '<h3>IR:</h3><p>' + data.ir + '</p>' + 
+								    '<h3>NPC:</h3><p>' + data.npc + '</p>';
+			    	} else if (data.immediate) {
+			    		div += '<h3>A:</h3><p>' + data.a + '</p>' + 
+			    				'<h3>B:</h3><p>' + data.b + '</p>' + 
+			    				'<h3>immediate:</h3><p>' + data.immediate + '</p>';
+			    	} else if (data.lmd) {
+			    		div += '<h3>LMD:</h3><p>' + data.lmd + '</p>' + 
+								'<h3>Memory range affected:</h3><p>' + data.memoryAffected + '</p>';
+			    	} else if (data.aluoutput) {
+			    		div += '<h3>AlUoutput:</h3><p>' + data.aluoutput + '</p>' + 
+	    						'<h3>Cond:</h3><p>' + data.cond + '</p>';
+			    	} else if (data.rn) {
+			    		div += '<h3>RN:</h3><p>' + data.rn + '</p>'; 
+	    			} else {
+	    				return;
+	    				}
+			    	
+			    	div += '</blockquote>' + 
+					       '</div>' + 
+					       '</div>';
+					
+					$('#pipelineDiv').prepend(div);
+			    	$('#nthCycle').val(nthCycle + 1);
+			    	
+			    	updateRegisters();
+			    	updateData();
+			    	if (nthCycle % 5 == 0) {
+						addOpcode();
+					}
+			    },
+			});
+		}
+	</script>
 </head>
+
 <body>
-	<h1>Form</h1>
-    <form action="#" th:action="@{/greeting}" method="post">
-        <p>Instructions:
-        	<div>
-        		<textarea name="instructions" class="form-control" rows="12"
-				    style="margin-top: 10px;"  placeholder="Add instructions only"
-				     th:text="${instructions}"></textarea>
-			</div>
-        </p>
-        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
-        
-        <table>
-        	<tbody>
-				<tr th:each="instructionElement : ${instructionMap}">
-				                 <td th:text="${instructionElement.key}">keyvalue</td>
-				                 <td th:text="${instructionElement.value}">num</td>
-				</tr>
-			</tbody>
-       </table>
-    </form>
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/main">MicroMips</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                	<li>
+                        <a href="/registerValues">Register Value</a>
+                    </li>
+                    <li>
+                        <a href="/dataValues">Memory</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">MicroMips
+                    <small>Sequential Version</small>
+                </h1>
+            </div>
+        </div>
+        <!-- /.row -->
+		<form action="#" th:action="@{/execute}" method="post">
+	        <!-- Projects Row -->
+	        <div class="row">
+	            <div class="col-md-6 portfolio-item">
+	            	<h3>
+	                    <a href="#">Input Instructions:</a>
+	                </h3>
+	                <textarea id="instructions" name="instructions" class="form-control" rows="12"
+					    style="margin-top: 10px;"  placeholder="Add instructions only"
+					     th:text="${instructions}">LD R10, 1000(R0)</textarea>
+					<input type="submit" value="Submit" />
+					<button class="btn btn-default" onclick="singleStep();return false;">Single step</button>
+					<input type="hidden" name="nthCycle" id="nthCycle" value="0"/>
+					
+					<h3 class="card card-outline-primary text-xs-center" 
+	                	 th:if="${errors != null and !errors.isEmpty()}">
+	                	 Errors:
+	                </h3>
+					<div class="alert alert-danger" th:each="error : ${errors}">
+						<span th:text="${error}">CycleKey</span>
+					</div>
+	            </div>
+	            <div class="col-md-6 portfolio-item">
+	            	<h3>
+	                    <a href="#">Opcodes:</a>
+	                </h3>
+	                <table id = "opcodeTable" class="table table-striped table-hover table-bordered">
+	                	<thead>
+	                		<tr>
+	                			<th>Instruction</th>
+	                			<th>Opcode</th>
+	                		</tr>
+	                	</thead>
+						<tbody id = "opcodeSection">
+							<tr th:each="instructionElement : ${instructionMap}">
+							                 <td th:text="${instructionElement.key}">Instruction</td>
+							                 <td th:text="${instructionElement.value}">Opcode</td>
+							</tr>
+						</tbody>
+					</table>
+	            </div>
+	        </div>
+	        <!-- /.row -->
+	
+	        <div class="row">
+	        	<!-- Pipeline map here -->
+	            <div 
+	            	 id = "pipelineDiv"
+	            	 class="col-md-6 portfolio-item"
+	            	 style="overflow-y:auto;height:1000px;">
+	                <div class="card card-outline-primary text-xs-center" 
+	                	 th:each="cycle : ${cycleMap}"
+	                	 th:if="${cycle.value.wasProcessed()}">
+	                	 <div th:switch="${cycle.value.whichCycle()}"
+	                	 	  class="card-block">
+	                	 	   
+							  <blockquote class="card-blockquote" th:case="'FetchCycle'">
+							  	<p th:text="${cycle.key}">Cycle</p>	
+					    		<h3>IR:</h3><p th:text="${cycle.value.getIr()}">CycleValue</p>
+					    		<h3>NPC:</h3><p th:text="${cycle.value.getNpc()}">CycleValue</p>
+							  </blockquote>
+							  <blockquote class="card-blockquote" th:case="'DecodeCycle'">
+							  	<p th:text="${cycle.key}">Cycle</p>
+					    		<h3>A:</h3><p th:text="${cycle.value.getA()}">CycleValue</p>
+					    		<h3>B:</h3><p th:text="${cycle.value.getB()}">CycleValue</p>
+					    		<h3>Immediate:</h3><p th:text="${cycle.value.getImmediate()}">CycleValue</p>
+					    	  </blockquote>
+							<blockquote class="card-blockquote" th:case="'ExecutionCycle'">
+								<p th:text="${cycle.key}">Cycle</p>
+								<h3>ALUOutput:</h3><p th:text="${cycle.value.getAluoutput()}">CycleValue</p>
+					    		<h3>Cond:</h3><p th:text="${cycle.value.getCond()}">CycleValue</p>
+							</blockquote>
+							<blockquote class="card-blockquote" th:case="'MemCycle'">
+								<p th:text="${cycle.key}">Cycle</p>
+								<h3>PC:</h3><p th:text="${cycle.value.getPc()}">CycleValue</p>
+								<h3>LMD:</h3><p th:text="${cycle.value.getLmd()}">CycleValue</p>
+								<h3>Memory Affected:</h3><p th:text="${cycle.value.getMemoryAffected()}">CycleValue</p>
+							</blockquote>
+							<blockquote class="card-blockquote" th:case="'WriteBackCycle'">
+								<p th:text="${cycle.key}">Cycle</p>
+								<h3>Rn:</h3><p th:text="${cycle.value.getRn()}">CycleValue</p>
+							</blockquote>
+							<blockquote class="card-blockquote" th:case="*">
+								<p>Cycle</p>
+								<p th:text="${cycle.value}">CycleValue</p>
+							</blockquote>
+						</div>
+					  </div>
+	            	</div>
+	            
+	            <h3>
+                    Memory
+                </h3>
+	            <!-- Memory -->
+	            <div id ="memoryTable" class="col-md-6 portfolio-item" style="overflow-y:auto;height:300px;">
+	                <table class="table table-striped table-hover table-bordered">
+		                <tbody>
+			                <thead>
+		                		<tr>
+		                			<th>Register</th>
+		                			<th>Value</th>
+		                		</tr>
+		                	</thead>
+							<tr th:each="registerValue : ${registerValues}">
+				                 <td th:text="${registerValue.key}">keyvalue</td>
+				                 <td th:text="${registerValue.value}">num</td>
+							</tr>
+						</tbody>
+	                </table>
+	            </div>
+	            
+	            <h3>
+                    Data
+                </h3>
+	             <!-- Data -->
+	            <div id="dataTable" class="col-md-6 portfolio-item" style="overflow-y:auto;height:300px;">
+	                <table class="table table-striped table-hover table-bordered">
+		                <tbody>
+			                <thead>
+		                		<tr>
+		                			<th>Data</th>
+		                			<th>Value</th>
+		                		</tr>
+		                	</thead>
+							<tr th:each="registerValue : ${dataValues}">
+				                 <td th:text="${registerValue.key}">keyvalue</td>
+				                 <td th:text="${registerValue.value}">num</td>
+							</tr>
+						</tbody>
+	                </table>
+	            </div>
+	        </div>
+	        <!-- /.row -->
+		</form>
+
+
+        <hr />
+
+        <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; Your Website 2014</p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </footer>
+
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery -->
+    <script src="/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js"></script>
+
 </body>
+
 </html>

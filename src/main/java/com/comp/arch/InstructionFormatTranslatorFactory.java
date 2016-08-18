@@ -12,12 +12,17 @@ public class InstructionFormatTranslatorFactory {
 	@Autowired
 	private ITypeFormatTranslator iType;
 	
+	@Autowired
+	private JTypeFormatTranslator jType;
+	
 	public InstructionFormatTranslator getInstance(InstructionType instType) {
 		switch(instType) {
 			case R:
 				return rType;
 			case I:
 				return iType;
+			case J:
+				return jType;
 			default:
 				throw new IllegalArgumentException("No such Instruction Type");
 		}

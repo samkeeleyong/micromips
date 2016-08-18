@@ -9,6 +9,8 @@ import java.util.List;
  */
 public class Cycle {
 	
+	private static String currentNpc;
+	private static String currentPc;
 	/**
 	 * needs the previous cycle 
 	 * to process
@@ -52,6 +54,12 @@ public class Cycle {
 	private String lmd;
 	private String rn;
 	
+	private String registerA;
+	private String registerB;
+	private Object memoryAffected;
+	private String pc;
+	
+	public static boolean SHOULD_SKIP;
 	/**
 	 * call this to assign values
 	 * 
@@ -60,10 +68,13 @@ public class Cycle {
 	 */
 	public Cycle processCycle(Cycle previousCycle) {
 		
-//		boolean finished = false;
-		
 		for(MipCycle mipCycle: mipCycles) {
 			mipCycle.setCycle(previousCycle);
+			System.out.println(previousCycle);
+			System.out.println("Should Skip?:" + Cycle.SHOULD_SKIP);
+			if (!(mipCycle instanceof FetchCycle) && Cycle.SHOULD_SKIP) {
+				continue;
+			}
 			
 			if (mipCycle instanceof FetchCycle) {
 				FetchCycle IF = (FetchCycle)mipCycle;
@@ -86,35 +97,38 @@ public class Cycle {
 				ExecutionCycle EX = (ExecutionCycle) mipCycle;
 				
 				String aluoutput = EX.processALUOUTPUT();
+				
 				int cond = EX.getCond();
 				
 				this.aluoutput = aluoutput;
 				this.cond = cond;
+				this.b = EX.getB();
 			} else if (mipCycle instanceof MemCycle) {
 				MemCycle MEM = (MemCycle)mipCycle;
+				String pc = MEM.getPc();
+				this.pc = pc;
 				
 				String lmd = MEM.processLMD();
 				this.lmd = lmd;
+				this.aluoutput = MEM.getAluoutput();
+				this.memoryAffected = MEM.getMemoryAffected(); 
 			} else if (mipCycle instanceof WriteBackCycle) {
 				WriteBackCycle WB = (WriteBackCycle)mipCycle;
-				String rn = WB.processRn();
 				
+				String rn = WB.processRn();
 				this.rn = rn;
+			}
+			
+			if (!Cycle.SHOULD_SKIP) {
+				mipCycle.setWasProcessed(true);
 			}
  		}
 		return this;
 	}
 
-	public String processIR() {
-		// just return opcode
-		return "";
-	}
-	
-	
 	@Override
 	public String toString() {
-		return "Cycle [previousCycle=" + previousCycle + ", mipCycles="
-				+ mipCycles + ", ir=" + ir + ", npc=" + npc + ", immediate="
+		return "Cycle [previousCycle=" + previousCycle + " ir=" + ir + ", npc=" + npc + ", immediate="
 				+ immediate + ", b=" + b + ", a=" + a + ", aluoutput="
 				+ aluoutput + ", cond=" + cond + ", lmd=" + lmd + "]\n";
 	}
@@ -205,5 +219,63 @@ public class Cycle {
 
 	public void setLmd(String lmd) {
 		this.lmd = lmd;
+	}
+
+	public String getRn() {
+		return rn;
+	}
+
+	public void setRn(String rn) {
+		this.rn = rn;
+	}
+
+	public String getRegisterA() {
+		return registerA;
+	}
+
+	public void setRegisterA(String registerA) {
+		this.registerA = registerA;
+	}
+
+	public String getRegisterB() {
+		return registerB;
+	}
+
+	public void setRegisterB(String registerB) {
+		this.registerB = registerB;
+	}
+
+	public Object getMemoryAffected() {
+		return memoryAffected;
+	}
+
+	public void setMemoryAffected(Object memoryAffected) {
+		this.memoryAffected = memoryAffected;
+	}
+
+	public static String getCurrentNpc() {
+		
+		if (currentNpc == null) {
+			currentNpc = "0000";
+		}
+		
+		return currentNpc;
+	}
+	
+	public static void setCurrentNpc(String changedNpc) {
+		currentNpc = changedNpc; 
+	}
+	
+	public static String getCurrentPc() {
+		
+		if (currentPc == null) {
+			currentPc = "0000";
+		}
+		
+		return currentPc;
+	}
+	
+	public static void setCurrentPc(String changedPc) {
+		currentPc = changedPc;
 	}
 }

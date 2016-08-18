@@ -71,7 +71,7 @@ public class InstFormat {
 		return result;
 	}
 
-	public static String toHex(String binaryStr) {
+	public static String toHexByFour(String binaryStr) {
 		String[] split = binaryStr.split("(?<=\\G....)");
 		String hexStr = "";
 		for (String s: split) {
@@ -83,6 +83,10 @@ public class InstFormat {
 		}
 		
 	    return hexStr;
+	}
+	
+	public static String toHex(String num) {
+		return Integer.toHexString(Integer.parseInt(num));
 	}
 	
 	public String getInstruction() {

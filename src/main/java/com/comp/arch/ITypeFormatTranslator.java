@@ -1,6 +1,6 @@
 package com.comp.arch;
 
-import java.util.Arrays;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,11 +12,38 @@ public class ITypeFormatTranslator implements InstructionFormatTranslator {
 	private InstructionFormatRepository instructionFormatRepository;
 	
 	@Override
-	public String translate(String instruction, String instructionKeyword) {
+	public String translate(String instruction, String instructionKeyword, Map<String, String> offsetMap) {
+		
 		InstFormat instFormat = instructionFormatRepository.findByInstruction(instructionKeyword);
 		String result = "";
-		
-		if (instFormat.getOffset()) {
+		if (instFormat.getInstruction().equals("BNE")) {
+			// BNE R1, R2, L1
+			String actualInstruction = instruction.split(" ")[0]; // BNE
+			String actualVariableStr = instruction.split(actualInstruction)[1]; // e.g. R1, R2, L1
+			String actualRs = actualVariableStr.split(",")[0]; // R1
+			String actualRt = actualVariableStr.split(",")[1]; // R2
+			String actualOffset = actualVariableStr.split(",")[2]; // L1
+			
+
+			instFormat.getActualVariablesMap().put("rs", instFormat.translateRegisterToBinary(actualRs.trim()));
+			instFormat.getActualVariablesMap().put("rt", instFormat.translateRegisterToBinary(actualRt.trim()));
+//			instFormat.getActualVariablesMap().put("offset", actualOffset.trim());
+			
+			System.out.println(instFormat.getActualVariablesMap());
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append(instFormat.getOpCode());
+			sb.append(instFormat.getVariable("rs"));
+			sb.append(instFormat.getVariable("rt"));
+			String offset = offsetMap.get(instruction);
+			offset = Integer.toBinaryString(Integer.parseInt(offset));	
+			offset = ("0000000000000000" + offset).substring(offset.length());
+			sb.append(offset);
+			
+			System.out.println(sb.toString());
+			result = InstFormat.toHexByFour(sb.toString());
+			System.out.println(result);
+		} else if (instFormat.getOffset()) {
 			String actualOpCode = instruction.split(" ")[0]; // LD
 			String actualVariableStr = instruction.split(actualOpCode)[1]; // e.g. R1,offset(base)
 			String actualRt = actualVariableStr.split(",")[0]; // R1
@@ -42,7 +69,7 @@ public class ITypeFormatTranslator implements InstructionFormatTranslator {
 			sb.append(instFormat.getVariable("base"));
 			sb.append(instFormat.getVariable("rt"));
 			
-			result = InstFormat.toHex(sb.toString()) + instFormat.getVariable("offset");
+			result = InstFormat.toHexByFour(sb.toString()) + instFormat.getVariable("offset");
 			System.out.println(result);
 		} else if (instFormat.getImmediate()) {
 			String actualOpCode = instruction.split(" ")[0]; // OP
@@ -64,7 +91,10 @@ public class ITypeFormatTranslator implements InstructionFormatTranslator {
 			sb.append(instFormat.getOpCode());
 			sb.append(instFormat.getVariable("rs"));
 			sb.append(instFormat.getVariable("rt"));
-			result = InstFormat.toHex(sb.toString()) + instFormat.getVariable("immediate").substring(1);
+			
+			System.out.println(sb.toString() + instFormat.getVariable("immediate").substring(1));
+			
+			result = InstFormat.toHexByFour(sb.toString()) + instFormat.getVariable("immediate").substring(1);
 			System.out.println(result);
 		}
 

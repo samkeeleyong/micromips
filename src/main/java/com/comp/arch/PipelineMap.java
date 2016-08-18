@@ -1,13 +1,16 @@
 package com.comp.arch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import cycle.Cycle;
 import cycle.DecodeCycle;
 import cycle.ExecutionCycle;
 import cycle.FetchCycle;
 import cycle.MemCycle;
+import cycle.WriteBackCycle;
 
 /**
  * Represents a pipeline map with 
@@ -26,61 +29,76 @@ public class PipelineMap {
 		this.cycles = cycles;
 	}
 
-	public void setUpMipCycles(List<String> opcodes, int numberOfCycles, String[] instructions) {
+	public void setUpMipCycles(List<String> opcodes, String[] instructions, String[] instructionSplit, Map<String, String> offsetMap) {
 		// fill up cycle objects
-		String[] cycleCodes = new String[] {"IF", "ID", "EX", "MEM", "WEB"};
+		String[] cycleCodes = new String[] {"IF", "ID", "EX", "MEM", "WB"};
+		int cycleCounter = 0;
 		
-		int[] indexToStart = new int[] {0, 1, 2};
-		int[] cycleIndex = new int[3];
+		String[] instructionAddresses = getHexValues("0004", opcodes.size(), true, 4);
 		
-		for (int i = 0; i < numberOfCycles; i++) {
-			Cycle cycle = new Cycle(1 + i + "");
+		System.out.println("Number of opcodes: " + opcodes.size());
+		for (int i = 0; i < opcodes.size(); i++) {
 			
-//			System.out.printf("Cycle %d\t", i + 1);
-			for (int j = 0; j < instructions.length; j++) {
-				if (i >= indexToStart[j]) {
-					try {
-						String cycleCode = cycleCodes[cycleIndex[j]];
-						String opcode = opcodes.get(j);
-						String instruction = instructions[j];
-//						System.out.println(cycleCode);
-						switch(cycleCode) {
-							case "IF":
-								FetchCycle fetchCycle = new FetchCycle(opcode, "0000");
-								cycle.addMipCycle(fetchCycle);
-								
-								break;
-							case "ID":
-								DecodeCycle decodeCycle= new DecodeCycle(opcode);
-								cycle.addMipCycle(decodeCycle);
-								
-								break;
-							case "EX":
-								ExecutionCycle executionCycle = new ExecutionCycle(instruction);
-								cycle.addMipCycle(executionCycle);
-								
-								break;
-							case "MEM":
-								MemCycle memCycle = new MemCycle(instruction);
-								cycle.addMipCycle(memCycle);
-								break;
-							default:
-								break;
-							
-						}
-						cycleIndex[j] = cycleIndex[j] + 1;
-					
-					} catch (ArrayIndexOutOfBoundsException e) {
-						continue;
-					}
+			for (int j = 0; j < cycleCodes.length; j++) {
+				Cycle cycle = new Cycle(1 + cycleCounter + "");
+				
+				String cycleCode = cycleCodes[j];
+				String opcode = opcodes.get(i);
+				String instruction = instructions[i];
+				String instructionLine = instructionSplit[i];
+				
+				switch(cycleCode) {
+					case "IF":
+						FetchCycle fetchCycle = new FetchCycle(opcode, instructionAddresses[i]);
+						cycle.addMipCycle(fetchCycle);
+						
+						break;
+					case "ID":
+						DecodeCycle decodeCycle= new DecodeCycle(opcode, instructionLine);
+						cycle.addMipCycle(decodeCycle);
+						
+						break;
+					case "EX":
+						ExecutionCycle executionCycle = new ExecutionCycle(instruction);
+						cycle.addMipCycle(executionCycle);
+						
+						break;
+					case "MEM":
+						MemCycle memCycle = new MemCycle(instruction, instructionLine);
+						cycle.addMipCycle(memCycle);
+						break;
+					case "WB":
+						WriteBackCycle wmCycle = new WriteBackCycle(instruction, instructionLine);
+						cycle.addMipCycle(wmCycle);
+						break;
+					default:
+						break;
 				}
+				
+				cycles.add(cycle);
+				cycleCounter++;
 			}
-			cycles.add(cycle);
 		}
 		
-		System.out.println(cycles);
+		System.out.println("Cycles after setup:" + cycles);
 	}
 
+	public static String[] getHexValues(String startingPoint, int numberOfHexSeries, boolean includeStartingPoint, int increment) {
+		String[] hexValues = new String[numberOfHexSeries];		
+		String currentValue = startingPoint;
+		
+		if (includeStartingPoint) {
+			currentValue = Integer.toHexString(Integer.parseInt(currentValue, 16) - increment);
+		}
+		for(int i = 0; i < numberOfHexSeries; i++) {
+			int valueInInt = Integer.parseInt(currentValue, 16) + increment;
+			currentValue = Integer.toHexString(valueInInt);
+			
+			hexValues[i] = ("0000" + currentValue).substring(currentValue.length());
+		}
+		
+		return hexValues;
+	}
 	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();
