@@ -30,7 +30,6 @@ public class MemoryHolder {
 		
 		address = Integer.toHexString(Integer.parseInt(address, 16) + 7);
 		for(int i = 7; i >= 0; i--) {
-			System.out.println("Getting:" + address);
 			dataBuilder.append(memory.get(address));
 			address = Integer.toHexString(Integer.parseInt(address, 16) - 1);
 		}

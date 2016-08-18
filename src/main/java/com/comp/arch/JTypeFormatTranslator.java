@@ -18,14 +18,10 @@ public class JTypeFormatTranslator implements InstructionFormatTranslator {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(instFormat.getOpCode());
-		System.out.println("MEOW");
-		System.out.println(instFormat.getOpCode());
 		String offset = offsetMap.get(instruction);
 		offset = Integer.toBinaryString(Integer.parseInt(offset));
 		offset = ("00000000000000000000000000" + offset).substring(offset.length());
-		System.out.println(offset);
 		sb.append(offset);
-		System.out.println(sb.toString());
 		return InstFormat.toHexByFour(sb.toString());
 	}
 }

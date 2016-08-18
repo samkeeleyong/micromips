@@ -70,8 +70,6 @@ public class Cycle {
 		
 		for(MipCycle mipCycle: mipCycles) {
 			mipCycle.setCycle(previousCycle);
-			System.out.println(previousCycle);
-			System.out.println("Should Skip?:" + Cycle.SHOULD_SKIP);
 			if (!(mipCycle instanceof FetchCycle) && Cycle.SHOULD_SKIP) {
 				continue;
 			}

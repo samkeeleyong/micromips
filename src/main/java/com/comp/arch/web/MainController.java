@@ -171,7 +171,6 @@ public class MainController {
     	String[] instructionCommands = new String[instructionSplit.length];
     	
     	offsetMap = calculateOffsetMap(instructions);
-    	System.out.println("OffsetMap: " + offsetMap);
     	translateToOpcode(opcodes, instructionMap, instructionSplit, instructionCommands, offsetMap);
     	redirectAttributes.addFlashAttribute("instructionMap", instructionMap);
     	// END CONVERT
@@ -321,9 +320,7 @@ public class MainController {
     		} else {
     			instructionCommands[i] = instructionCommand;
     		}
-    		System.out.println("INstruction Command:" + instructionCommands[i]);
     		InstFormat instructionFormat = instructionFormatRepository.findByInstruction(instructionCommands[i]);
-    		System.out.println(instructionFormat);
     		InstructionFormatTranslator translator = translatorFactory.getInstance(instructionFormat.getInstructionType());
     		String opcode = translator.translate(instructionLine, instructionCommands[i], offsetMap);
     		

@@ -64,10 +64,6 @@ public class ExecutionCycle implements MipCycle {
 				
 				break;
 			case "BNE":
-				System.out.println("BNE");
-				System.out.println(Integer.parseInt(Cycle.getCurrentNpc()));
-				System.out.println((Integer.parseInt(cycle.getImmediate()) << 2));
-				System.out.println((Integer.parseInt(Cycle.getCurrentNpc()) + (Integer.parseInt(cycle.getImmediate()) << 2)));
 				aluoutput = Integer.toHexString((Integer.parseInt(Cycle.getCurrentNpc()) + (Integer.parseInt(cycle.getImmediate()) << 2)));
 				// cond
 				number1 = Integer.parseInt(cycle.getA(), 16);
@@ -79,7 +75,6 @@ public class ExecutionCycle implements MipCycle {
 				
 				break;
 			default:
-				System.out.println("ex wat");
 				aluoutput = "";
 				break;
 		}
@@ -90,9 +85,6 @@ public class ExecutionCycle implements MipCycle {
 		
 		aluoutput = ("0000000000000000" + aluoutput).substring(aluoutput.length());
 		cycle.setAluoutput(aluoutput);
-		
-		System.out.println("\tALUOutput:" + aluoutput);
-		System.out.println("\tCond:" + cond);
 		
 		cycle.setRegisterA(cycle.getRegisterA());
 		cycle.setRegisterB(cycle.getRegisterB());

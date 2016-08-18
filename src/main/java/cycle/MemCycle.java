@@ -29,8 +29,6 @@ public class MemCycle implements MipCycle {
 				String aluoutput = cycle.getAluoutput();
 				
 				Integer address = Integer.parseInt(aluoutput.substring(aluoutput.length() - 4));
-				System.out.println(aluoutput);
-				System.out.println(address);
 				lmd = MemoryHolder.getDataFrom(address.toString());
 				System.out.println(lmd);
 				break;
@@ -50,12 +48,6 @@ public class MemCycle implements MipCycle {
 					
 					String cheated = Integer.toHexString((Integer.parseInt(Cycle.getCurrentNpc(), 16) - 4) + (4 * Integer.parseInt(MainController.offsetMap.get(instructionLine))));
 					aluoutput = ("0000000000000000" + cheated).substring(cheated.length());
-					System.out.println("cheat");
-					System.out.println((Integer.parseInt(Cycle.getCurrentNpc(), 16)));
-					System.out.println(" - 4");
-					
-					System.out.println(" + ( 4 * " + Integer.parseInt(MainController.offsetMap.get(instructionLine)) + ")");
-					System.out.println("Address to jump:" + aluoutput);
 					Cycle.setCurrentPc(aluoutput);
 				}
 				
@@ -69,7 +61,6 @@ public class MemCycle implements MipCycle {
 				break;
 		}
 		
-		System.out.println("\tLMD:" + lmd);
 		cycle.setIr(lmd);
 		this.aluoutput = cycle.getAluoutput();
 		

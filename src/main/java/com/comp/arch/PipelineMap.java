@@ -36,7 +36,6 @@ public class PipelineMap {
 		
 		String[] instructionAddresses = getHexValues("0004", opcodes.size(), true, 4);
 		
-		System.out.println("Number of opcodes: " + opcodes.size());
 		for (int i = 0; i < opcodes.size(); i++) {
 			
 			for (int j = 0; j < cycleCodes.length; j++) {
@@ -80,7 +79,6 @@ public class PipelineMap {
 			}
 		}
 		
-		System.out.println("Cycles after setup:" + cycles);
 	}
 
 	public static String[] getHexValues(String startingPoint, int numberOfHexSeries, boolean includeStartingPoint, int increment) {

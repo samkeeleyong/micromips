@@ -15,7 +15,6 @@ public class FetchCycle implements MipCycle{
 	
 	public String processIR() {
 		
-		System.out.println("\tIR:" + ir);
 		cycle.setIr(ir);
 		return ir;
 	}
@@ -23,20 +22,16 @@ public class FetchCycle implements MipCycle{
 	public String processNPC() {
 		this.npc = Cycle.getCurrentPc();
 		this.npc = Integer.toHexString((Integer.parseInt(npc, 16) + 4));
-		System.out.println("processNpc(0");
-		System.out.println("NPC:" + ("0000" + npc).substring(npc.length()));
-		System.out.println("Instruction Address:" + instructionAddress);
+
 		if (!("0000" + npc).substring(npc.length()).equals(instructionAddress)) {
 			Cycle.SHOULD_SKIP = true;
 			return "";
 		} else {
 			Cycle.SHOULD_SKIP = false;
 		}
-		System.out.println("Should skip:" + Cycle.SHOULD_SKIP);
 		Cycle.setCurrentNpc(npc);
 		npc = ("0000000000000000" + npc).substring(npc.length());
 		cycle.setNpc(npc);
-		System.out.println("\tNPC:" + npc);
 		
 		return npc;
 	}

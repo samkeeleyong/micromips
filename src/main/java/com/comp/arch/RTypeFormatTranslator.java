@@ -36,7 +36,6 @@ public class RTypeFormatTranslator implements InstructionFormatTranslator {
 		sb.append(instFormat.getFifthParam());
 		sb.append(instFormat.getFunc());
 		
-		System.out.println(sb.toString());
 		return InstFormat.toHexByFour(sb.toString());
 	}
 }

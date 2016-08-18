@@ -18,7 +18,6 @@ public class RegisterValuesHolder {
 	}
 	
 	public static String getRegistervalue(String registerNumber, boolean withoutR) {
-		System.out.println("Getting " + registerNumber + ":" + registerValues.get(registerNumber));
 		return registerValues.get(registerNumber);
 	}
 	

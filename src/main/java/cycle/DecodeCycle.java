@@ -27,7 +27,6 @@ public class DecodeCycle implements MipCycle {
 			immediate = ("0000000000000000" + immediate).substring(immediate.length());
 		}
 		cycle.setImmediate(immediate);
-		System.out.println("\tImmediate:" + immediate);
 		
 		return immediate;
 	}
@@ -38,13 +37,11 @@ public class DecodeCycle implements MipCycle {
 		a = a.substring(0, 5);
 		
 		String register = "R" + Integer.parseInt(a, 2);
-		System.out.println("Register for A:" + register);
 		cycle.setRegisterA(register.trim());
 		a = RegisterValuesHolder.getRegistervalue(register, false);
 		a = ("0000000000000000" + a).substring(a.length());
 		cycle.setA(a);
 		setA(a);
-		System.out.println("\tA:" + a);
 		return a;
 	}
 	
@@ -55,15 +52,12 @@ public class DecodeCycle implements MipCycle {
 		b = b.substring(5);
 		
 		String register = "R" + Integer.parseInt(b, 2);
-		System.out.println("Register for B:" + register);
 		
 		cycle.setRegisterB(register.trim());
 		b = RegisterValuesHolder.getRegistervalue(register, false);
-		System.out.println("Bee:" + b);
 		b = ("0000000000000000" + b).substring(b.length());
 		cycle.setB(b);
 		setB(b);
-		System.out.println("\tB:" + b);
 		return b;
 	}
 

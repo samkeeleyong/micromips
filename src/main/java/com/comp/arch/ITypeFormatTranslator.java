@@ -29,8 +29,6 @@ public class ITypeFormatTranslator implements InstructionFormatTranslator {
 			instFormat.getActualVariablesMap().put("rt", instFormat.translateRegisterToBinary(actualRt.trim()));
 //			instFormat.getActualVariablesMap().put("offset", actualOffset.trim());
 			
-			System.out.println(instFormat.getActualVariablesMap());
-			
 			StringBuilder sb = new StringBuilder();
 			sb.append(instFormat.getOpCode());
 			sb.append(instFormat.getVariable("rs"));
@@ -40,9 +38,7 @@ public class ITypeFormatTranslator implements InstructionFormatTranslator {
 			offset = ("0000000000000000" + offset).substring(offset.length());
 			sb.append(offset);
 			
-			System.out.println(sb.toString());
 			result = InstFormat.toHexByFour(sb.toString());
-			System.out.println(result);
 		} else if (instFormat.getOffset()) {
 			String actualOpCode = instruction.split(" ")[0]; // LD
 			String actualVariableStr = instruction.split(actualOpCode)[1]; // e.g. R1,offset(base)
@@ -62,7 +58,6 @@ public class ITypeFormatTranslator implements InstructionFormatTranslator {
 			instFormat.getActualVariablesMap().put("offset", actualOffset.trim());
 			instFormat.getActualVariablesMap().put("base", instFormat.translateRegisterToBinary(actualBase.trim()));
 			
-			System.out.println(instFormat.getActualVariablesMap());
 			
 			StringBuilder sb = new StringBuilder();
 			sb.append(instFormat.getOpCode());
@@ -70,7 +65,6 @@ public class ITypeFormatTranslator implements InstructionFormatTranslator {
 			sb.append(instFormat.getVariable("rt"));
 			
 			result = InstFormat.toHexByFour(sb.toString()) + instFormat.getVariable("offset");
-			System.out.println(result);
 		} else if (instFormat.getImmediate()) {
 			String actualOpCode = instruction.split(" ")[0]; // OP
 			String actualVariableStr = instruction.split(actualOpCode)[1]; // e.g. R1,R2,R3
@@ -92,10 +86,7 @@ public class ITypeFormatTranslator implements InstructionFormatTranslator {
 			sb.append(instFormat.getVariable("rs"));
 			sb.append(instFormat.getVariable("rt"));
 			
-			System.out.println(sb.toString() + instFormat.getVariable("immediate").substring(1));
-			
 			result = InstFormat.toHexByFour(sb.toString()) + instFormat.getVariable("immediate").substring(1);
-			System.out.println(result);
 		}
 
 		return result;
