@@ -1,6 +1,6 @@
 package cycle;
 
-import com.comp.arch.InstFormat;
+import com.comp.arch.web.InstFormat;
 
 public class ExecutionCycle implements MipCycle {
 	

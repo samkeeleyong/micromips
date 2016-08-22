@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.comp.arch.InstFormat;
 import com.comp.arch.InstructionFormatRepository;
 import com.comp.arch.InstructionFormatTranslator;
 import com.comp.arch.InstructionFormatTranslatorFactory;
@@ -139,7 +138,6 @@ public class MainController {
 			currentOpcodesForSingleStep.put(instructionSplit[i], opcodes.get(i));	
 		}
 		
-		System.out.println(pipelineMap.getCycles().size());
 		/*if (nthCycle >= pipelineMap.getCycles().size()) {
     		return null;
     	}*/
@@ -206,7 +204,7 @@ public class MainController {
 		List<String> listOfInstructions = Arrays.asList(instructions.split("\n"));
 		List<String> listOfPossibleInstructions = new ArrayList<>();
 		
-		for(InstFormat instFormat: (List<InstFormat>) instructionFormatRepository.findAll()) {
+		for(InstFormat instFormat: instructionFormatRepository.findAll()) {
 			listOfPossibleInstructions.add(instFormat.getInstruction());
 		}
 		

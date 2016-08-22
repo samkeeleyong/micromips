@@ -1,9 +1,29 @@
 package com.comp.arch;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface InstructionFormatRepository extends CrudRepository<InstFormat, String>{
+import com.comp.arch.web.InstFormat;
 
-	InstFormat findByInstruction(String instruction);
+@Component
+public class InstructionFormatRepository{
+
+	public Map<String, InstFormat> map = new HashMap<>();
+	
+	public InstFormat findByInstruction(String instruction) {
+		return map.get(instruction);
+	};
+	
+	public void save(InstFormat format) {
+		map.put(format.getInstruction(), format);
+	}
+
+	public Collection<InstFormat> findAll() {
+		return map.values();
+	}
 }

@@ -5,6 +5,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.comp.arch.web.InstFormat;
+import com.sun.corba.se.spi.activation.Repository;
+
 @Component
 public class ITypeFormatTranslator implements InstructionFormatTranslator {
 
